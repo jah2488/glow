@@ -2,6 +2,11 @@ class GLTransform < Parslet::Transform
   rule(variable: simple(:identifier)) { Variable.new(identifier).with_location(identifier.line_and_column)}
   rule(number: simple(:digits)) { Number.new(digits).with_location(digits.line_and_column) }
   rule(string: simple(:chars)) { GLString.new(chars).with_location(chars.line_and_column) }
+  rule(boolean: { true: simple(:bool)}) { True.new(bool) }
+  rule(boolean: { false: simple(:bool)}) { False.new(bool) }
+  rule(boolean: { and: simple(:bool)}) { And.new(bool) }
+  rule(boolean: { not: simple(:bool)}) { Not.new(bool) }
+  rule(boolean: { or: simple(:bool)}) { Or.new(bool) }
 
   rule(assign: { target: simple(:target), value: simple(:value) }) do
     Assign.new(target, value).with_location(target.line_and_column)

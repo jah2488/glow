@@ -5,6 +5,9 @@ require './lib/parser'
 require './lib/transform'
 require './lib/nodes'
 require './lib/types'
+
+# Really need to silence these hundreds of parslet warnings in a better way
+$stderr = StringIO.new
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true

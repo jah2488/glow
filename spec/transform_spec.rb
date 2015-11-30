@@ -29,4 +29,12 @@ RSpec.describe GLTransform do
       expect(trans("first(x, 10, \"foobar\")")).to be_a(Call)
     end
   end
+  context 'boolean' do
+    it 'returns true object' do
+      expect(trans("true")).to be_a(True)
+    end
+    it 'returns false object' do
+      expect(trans("false")).to be_a(False)
+    end
+  end
 end

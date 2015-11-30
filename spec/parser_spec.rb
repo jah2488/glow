@@ -3,6 +3,23 @@ require 'parslet/rig/rspec'
 
 RSpec.describe GLParser do
   let(:parser) { GLParser.new }
+  context 'booleans' do
+    it 'consumes true' do
+      expect(parser.boolean).to(parse("true"))
+    end
+    it 'consumes false' do
+      expect(parser.boolean).to(parse("false"))
+    end
+    it 'consumes and' do
+      expect(parser.boolean).to parse("and")
+      expect(parser.boolean).to parse("&&")
+    end
+
+    it 'consumes or' do
+      expect(parser.boolean).to parse("or")
+      expect(parser.boolean).to parse("||")
+    end
+  end
   context 'strings' do
     it 'consume quoted strings' do
       expect(parser.string).to parse('""')

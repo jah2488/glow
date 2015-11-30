@@ -34,17 +34,32 @@ class Run
       [output, new_ctx, new_env]
     end
   end
+
+  def pry
+    parser = GLParser.new
+    trans  = GLTransform.new
+    binding.pry
+  end
 end
 
 runner = Run.new
-input  = 'help = "hello world"'
-ctx    = {}
-env    = {}
-until input =~ /(exit|quit)/
-  print 'gl > '
-  input  = gets.chomp
-  output = runner.eval(input, ctx, env)
-  puts "#=> #{output[0]}"
-  ctx = output[1]
-  env = output[2]
+puts "(R)run REPL"
+puts "(P)ry"
+case gets.chomp.upcase
+when "R"
+  input  = 'help = "hello world"'
+  ctx    = {}
+  env    = {}
+  until input =~ /(exit|quit)/
+    print 'gl > '
+    input  = gets.chomp
+    output = runner.eval(input, ctx, env)
+    puts "#=> #{output[0]}"
+    ctx = output[1]
+    env = output[2]
+  end
+when "P"
+  runner.pry
+else
+  exit
 end

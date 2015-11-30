@@ -1,0 +1,2 @@
+class CallType < Type
+end

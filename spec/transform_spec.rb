@@ -26,6 +26,20 @@ RSpec.describe GLTransform do
       }")).to be_a(If)
     end
   end
+  context 'if else' do
+    it 'returns an if with else object' do
+      expect(trans("if (true) {
+        a = 1
+      } else {
+        b = 1
+      }")).to be_a(If)
+      expect(trans("if (true) {
+        a = 1
+      } else {
+        b = 1
+      }")).to be_a(If)
+    end
+  end
   context 'function' do
     it 'returns a function object' do
       expect(trans("fn (x:Int):Int { x }")).to be_a(Function)

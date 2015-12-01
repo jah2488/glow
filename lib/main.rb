@@ -18,6 +18,8 @@ first(10, n)
 if (true) {
   x = 10
   first(n, x)
+} else {
+  last(n, x)
 }
 '
 

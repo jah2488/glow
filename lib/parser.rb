@@ -1,19 +1,6 @@
-class GLParser < Parslet::Parser
+class Main < Parslet::Parser
   rule(:space)  { match('\s').repeat(1) }
   rule(:space?) { space.maybe }
-
-  rule(:number) { match('\d').repeat(1).as(:number) >> space? }
-  rule(:string) { (str('"') >> match('[^"]').repeat(0) >> str('"')).as(:string) >> space? }
-
-  rule(:b_false) { (str('false') >> space?).as(:false) }
-  rule(:b_true)  { (str('true')  >> space?).as(:true) }
-  rule(:b_and)   { ((str('and')| str('&&')) >> space?).as(:and)}
-  rule(:b_not)   { ((str('not')| str('!'))  >> space?).as(:not) }
-  rule(:b_or)    { ((str('or') | str('||')) >> space?).as(:or) }
-  rule(:boolean) { (b_true | b_false | b_and | b_or | b_not).as(:boolean) }
-
-  rule(:body_if) { (str('if') >> space? >> lparen >> expression.as(:predicate) >> rparen >> space? >> body).as(:if) }
-
 
   literals = {
     lparen: '(',
@@ -27,6 +14,27 @@ class GLParser < Parslet::Parser
   literals.each do |name, val|
     rule(name) { str(val) >> space? }
   end
+end
+
+class Booleans < Main
+  rule(:b_false) { (str('false') >> space?).as(:false) }
+  rule(:b_true)  { (str('true')  >> space?).as(:true) }
+  rule(:b_and)   { ((str('and')| str('&&')) >> space?).as(:and)}
+  rule(:b_not)   { ((str('not')| str('!'))  >> space?).as(:not) }
+  rule(:b_or)    { ((str('or') | str('||')) >> space?).as(:or) }
+  rule(:boolean) { (b_true | b_false | b_and | b_or | b_not).as(:boolean) }
+  root(:boolean)
+end
+
+class Conditionals < Main
+
+  root(:conditional)
+end
+
+class GLParser < Main
+  rule(:number) { match('\d').repeat(1).as(:number) >> space? }
+  rule(:string) { (str('"') >> match('[^"]').repeat(0) >> str('"')).as(:string) >> space? }
+
 
   rule(:fn) { (str('fn') | str('->')) >> space? }
 
@@ -37,10 +45,17 @@ class GLParser < Parslet::Parser
   rule(:assign) { (identifier.as(:target) >> equals >> expression.as(:value)).as(:assign) }
   rule(:variable) { identifier.as(:variable) }
 
+  rule(:l_if)   { str('if')   >> space? }
+  rule(:l_else) { str('else') >> space? }
+  rule(:predicate) { lparen >> space? >> expression.as(:predicate) >> space? >> rparen >> space? }
+  rule(:body_else) { (space? >> l_else >> body >> space?).as(:else) }
+  rule(:body_if)      { ( l_if >> predicate >> body >> body_else.maybe).as(:if) }
+  rule(:conditional)  { (body_if) }
 
   rule(:function) do
     (fn >> params >> colon >> constant.as(:return_type) >> body).as(:function)
   end
+
   rule(:named_function) do
     (fn >> identifier.as(:name).maybe >> params >> colon >> constant.as(:return_type) >> body).as(:named_function)
   end
@@ -57,8 +72,8 @@ class GLParser < Parslet::Parser
   rule(:args) { lparen >> (arg.maybe >> (comma >> arg).repeat(0)).as(:args) >> rparen }
   rule(:arg)  { expression.as(:arg) }
 
-  rule(:expression)  { (body_if | boolean | assign | function | named_function | call | string | number | variable) >> space? }
-  rule(:expressions) { space? >> expression.repeat(1) }
+  rule(:expression)  { ( conditional | Booleans.new | assign | function | named_function | call | string | number | variable) >> space? }
+  rule(:expressions) { space? >> expression.repeat(0) >> space? }
 
   root(:expressions)
 end

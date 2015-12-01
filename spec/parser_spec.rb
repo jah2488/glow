@@ -1,8 +1,7 @@
 require 'spec_helper'
 require 'parslet/rig/rspec'
-
-RSpec.describe GLParser do
-  let(:parser) { GLParser.new }
+RSpec.describe Booleans do
+  let(:parser) { Booleans.new }
   context 'booleans' do
     it 'consumes true' do
       expect(parser.boolean).to(parse("true"))
@@ -20,6 +19,10 @@ RSpec.describe GLParser do
       expect(parser.boolean).to parse("||")
     end
   end
+end
+RSpec.describe GLParser do
+  let(:parser) { GLParser.new }
+
   context 'strings' do
     it 'consume quoted strings' do
       expect(parser.string).to parse('""')
@@ -42,6 +45,21 @@ RSpec.describe GLParser do
           a = 1
         }")
       end
+    end
+    context 'else' do
+      it 'handles if statements with else clauses' do
+        expect(parser.body_if).to parse("if (true) { a = 1 } else { b = 1 }")
+        expect(parser.body_if).to parse("if (false) { x } else { y }")
+        expect(parser.body_if).to parse("if (true) {
+          a = 1
+        } else {
+          b = 1
+        }")
+      end
+    end
+
+    context 'case when' do
+
     end
   end
   context 'functions' do

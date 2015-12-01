@@ -7,11 +7,22 @@ class GLTransform < Parslet::Transform
   rule(boolean: { and: simple(:bool)}) { And.new(bool) }
   rule(boolean: { not: simple(:bool)}) { Not.new(bool) }
   rule(boolean: { or: simple(:bool)}) { Or.new(bool) }
+
   rule(if: {
     predicate: simple(:predicate),
-    body: sequence(:body)
+    body: sequence(:true_body),
   }) do
-    If.new(predicate, body)
+    If.new(predicate, true_body, nil)
+  end
+
+  rule(if: {
+    predicate: simple(:predicate),
+    body: sequence(:true_body),
+    else: {
+      body: sequence(:false_body)
+    }
+  }) do
+    If.new(predicate, true_body, false_body)
   end
 
   rule(assign: { target: simple(:target), value: simple(:value) }) do

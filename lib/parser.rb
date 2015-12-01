@@ -12,6 +12,8 @@ class GLParser < Parslet::Parser
   rule(:b_or)    { ((str('or') | str('||')) >> space?).as(:or) }
   rule(:boolean) { (b_true | b_false | b_and | b_or | b_not).as(:boolean) }
 
+  rule(:body_if) { (str('if') >> space? >> lparen >> expression.as(:predicate) >> rparen >> space? >> body).as(:if) }
+
 
   literals = {
     lparen: '(',
@@ -55,7 +57,7 @@ class GLParser < Parslet::Parser
   rule(:args) { lparen >> (arg.maybe >> (comma >> arg).repeat(0)).as(:args) >> rparen }
   rule(:arg)  { expression.as(:arg) }
 
-  rule(:expression)  { (boolean | assign | function | named_function | call | string | number | variable) >> space? }
+  rule(:expression)  { (body_if | boolean | assign | function | named_function | call | string | number | variable) >> space? }
   rule(:expressions) { space? >> expression.repeat(1) }
 
   root(:expressions)

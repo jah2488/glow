@@ -17,10 +17,22 @@ RSpec.describe GLTransform do
       expect(trans("10")).to be_a(Number)
     end
   end
+  context 'if' do
+    it 'returns an if object' do
+      expect(trans("if (true) { a = 1 }")).to be_a(If)
+      expect(trans("if (true) {
+        a = 1
+        b = 2
+      }")).to be_a(If)
+    end
+  end
   context 'function' do
     it 'returns a function object' do
       expect(trans("fn (x:Int):Int { x }")).to be_a(Function)
-      expect(trans("fn ():Int { x }")).to be_a(Function)
+      expect(trans("fn ():Int {
+        x
+        x
+      }")).to be_a(Function)
     end
   end
   context 'call' do

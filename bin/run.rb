@@ -10,7 +10,19 @@ class Run
   def nodes(src)
     GLTransform.new.apply(GLParser.new.parse(src))#.tap { |s| puts "Nodes: #{s.inspect}" }
   rescue Parslet::ParseFailed => e
-    puts e, e.cause.ascii_tree
+    cause = get_cause(e)
+    line, col = cause.source.line_and_column
+    str = src.split("\n")[line - 1]
+    puts str
+    puts cause.message
+  end
+
+  def get_cause(e)
+    cause = e.cause.children.first
+    until cause.children.empty?
+      cause = cause.children.first
+    end
+    cause
   end
 
   def type_check(src, ctx = {})
@@ -24,7 +36,7 @@ class Run
     output = nodes(src).map do |node|
       node.eval(env)
     end
-    [output, env]
+    return [output, env]
   end
 
   def eval(src, ctx = {}, env = {})
@@ -38,6 +50,7 @@ class Run
   def pry
     parser = GLParser.new
     trans  = GLTransform.new
+    puts parser, trans
     binding.pry
   end
 end
@@ -45,7 +58,13 @@ end
 runner = Run.new
 puts "(R)run REPL"
 puts "(P)ry"
+puts "(L)oad"
 case gets.chomp.upcase
+when "L"
+  print "File name: "
+  src = gets.chomp
+  file = File.open(src).read
+  puts runner.eval(file, {}, {})
 when "R"
   input  = 'help = "hello world"'
   ctx    = {}

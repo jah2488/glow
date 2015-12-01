@@ -7,8 +7,25 @@ require './lib/nodes'
 require './lib/types'
 
 # Really need to silence these hundreds of parslet warnings in a better way
-$stderr = StringIO.new
+class MyIO < StringIO
+  def puts(*strs)
+    strs.each do |str|
+      if str =~ /warning: instance variable @.{1,20} not initialized/
+      else
+        $og_stderr.puts str
+      end
+    end
+  end
+end
+
 RSpec.configure do |config|
+  $og_stderr = $stderr
+  config.before(:all) do
+    $stderr = MyIO.new
+  end
+  config.after(:all) do
+    $stderr = $og_stderr
+  end
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end

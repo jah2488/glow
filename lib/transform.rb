@@ -7,6 +7,12 @@ class GLTransform < Parslet::Transform
   rule(boolean: { and: simple(:bool)}) { And.new(bool) }
   rule(boolean: { not: simple(:bool)}) { Not.new(bool) }
   rule(boolean: { or: simple(:bool)}) { Or.new(bool) }
+  rule(if: {
+    predicate: simple(:predicate),
+    body: sequence(:body)
+  }) do
+    If.new(predicate, body)
+  end
 
   rule(assign: { target: simple(:target), value: simple(:value) }) do
     Assign.new(target, value).with_location(target.line_and_column)

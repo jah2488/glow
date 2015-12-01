@@ -14,10 +14,15 @@ fn first(x:Int, y:Int):Int { 1 }
 
 last(10, n)
 first(10, n)
+
+if (true) {
+  x = 10
+  first(n, x)
+}
 '
 
 def nodes(src)
-  GLTransform.new.apply(GLParser.new.parse(src))#.tap { |s| puts "Nodes: #{s.inspect}" }
+  GLTransform.new.apply(GLParser.new.parse(src)).tap { |s| puts "Nodes: #{s.inspect}" }
 rescue Parslet::ParseFailed => e
   puts e, e.cause.ascii_tree
 end

@@ -34,6 +34,16 @@ RSpec.describe GLParser do
       expect(parser.number).to parse("0")
     end
   end
+  context 'conditionals' do
+    context 'if' do
+      it 'consumes if statements' do
+        expect(parser.body_if).to parse("if (true) { a = 1 }")
+        expect(parser.body_if).to parse("if (false) {
+          a = 1
+        }")
+      end
+    end
+  end
   context 'functions' do
     context 'fn' do
       it 'allow fn or -> literal' do

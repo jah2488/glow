@@ -1,0 +1,11 @@
+a = 1
+
+if (true) {
+  a = 5
+}
+
+a
+
+if (false) {
+  a = 1
+}

@@ -29,7 +29,7 @@ class FunctionType < Type
     @return_type = fn.return_type
   end
 
-  def return_type(arg_types, ctx)
+  def verify_types_and_return(arg_types, ctx)
     verify(arg_types)
 
     call_ctx = {}.merge(parent: ctx)
@@ -47,6 +47,7 @@ class FunctionType < Type
 
   def verify(types)
     param_type_pairs = params.zip(types)
+    binding.pry
     param_type_pairs.each do |(param, type)|
       if param.refuse?(type)
         raise TypeMismatch.new(param, type)
@@ -60,7 +61,15 @@ class FunctionType < Type
     end
   end
 
+  def type
+    "fn(#{params.join(', ')}):#{return_type}".strip
+  end
+
   def inspect
-    "fn(#{params.join(', ')})"
+    if params.length > 1
+      "-> (#{params.join(', ')}) -> #{return_type}"
+    else
+      "-> #{return_type}"
+    end
   end
 end

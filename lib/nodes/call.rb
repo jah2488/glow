@@ -3,13 +3,13 @@ class Call < Node
 
   def initialize(target, args)
     @target = target.to_s.strip
-    @args   = args
+    @args   = Array(args).reject(&:empty?)
   end
 
   def type(ctx)
     ft = ctx.fetch(target)
     arg_types = args.map { |arg| arg.type(ctx) }
-    ft.return_type(arg_types, ctx)
+    ft.verify_types_and_return(arg_types, ctx)
   end
 
   def eval(env)

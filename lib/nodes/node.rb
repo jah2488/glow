@@ -22,4 +22,8 @@ class Node
     @location = location
     self
   end
+
+  def empty?
+    false
+  end
 end

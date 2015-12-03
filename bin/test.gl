@@ -1,11 +1,24 @@
-a = 1
+a = "first"
 
 if (true) {
-  a = 5
+  a = "should be true 2x"
 }
 
 a
 
 if (false) {
-  a = 1
+  a = "should never see this"
+} else {
+  a = "should now be 2"
 }
+
+a
+
+fn fizzbuzz(n : Int):String {
+  if (n % 15 == 0) { return "fizzbuzz" }
+  if (n % 5  == 0) { return "fizzbuzz" }
+  if (n % 3  == 0) { return "fizzbuzz" }
+  String(n)
+}
+
+fizzbuzz(5)

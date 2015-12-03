@@ -33,6 +33,9 @@ class GLTransform < Parslet::Transform
   rule(return_type: simple(:constant)) { constant.to_s.strip }
   rule(constant: simple(:constant)) { constant }
   rule(param: simple(:identifier), type: simple(:constant)) {  Param.new(identifier.to_s.strip, constant.to_s.strip).with_location(identifier.line_and_column) }
+
+
+  # Functions with arity of > 1
   rule(function: {
     params: sequence(:params),
     return_type: simple(:return_type),
@@ -40,6 +43,7 @@ class GLTransform < Parslet::Transform
   }) do
     Function.new(params, body, return_type).with_location(return_type.line_and_column)
   end
+  # Anonymous Functions with arity of 0 or 1
   rule(function: {
     params: simple(:params),
     return_type: simple(:return_type),
@@ -47,7 +51,22 @@ class GLTransform < Parslet::Transform
   }) do
     Function.new(params, body, return_type).with_location(return_type.line_and_column)
   end
-  rule(named_function: {name: simple(:name), params: sequence(:params), body: sequence(:body), return_type: simple(:return_type) }) do
+
+  rule(named_function: {
+      name: simple(:name),
+      params: sequence(:params),
+      return_type: simple(:return_type),
+      body: sequence(:body),
+  }) do
+    Function.new(params, body, return_type, name).with_location(return_type.line_and_column)
+  end
+
+  rule(named_function: {
+    name: simple(:name),
+    params: simple(:params),
+    return_type: simple(:return_type),
+    body: sequence(:body),
+  }) do
     Function.new(params, body, return_type, name).with_location(return_type.line_and_column)
   end
 

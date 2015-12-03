@@ -77,6 +77,20 @@ RSpec.describe GLParser do
         expect(parser.params).to parse('(a:String)')
         expect(parser.params).to parse('(a:String, b:Int)')
       end
+      context 'allows function signatures' do
+        it { expect(parser.params).to parse('(formatter:(Str):Str)') }
+        it 'can handle nested functions' do
+          expect(parser.params).to parse('(gen:(Int):(Int):Str)')
+        end
+        it 'can handle overly complicated functions' do
+          expect(parser.params).to parse('(gen:((Num):Str):(Num):Str)')
+        end
+        it 'permits type passthrough' do #TODO: Find out what this is called
+          expect(parser.params).to parse('(a:<T>, b:<D>)')
+        end
+        # it { expect(parser.params).to parse('(a):a') }
+        it { expect(parser.type_param).to parse('<T>') }
+      end
       context 'param' do
         it 'parses type and name' do
           expect(parser.param).to parse('a:Int')
@@ -96,15 +110,26 @@ RSpec.describe GLParser do
     context 'anonymous functions' do
       it 'allow function definition' do
         expect(parser.function).to parse("fn(a:Int):Int { a }")
-        expect(parser.function).to parse("fn ():Int { 10 }")
-        expect(parser.function).to parse("fn (a:Int):Int { a }")
+        expect(parser.function).to parse('fn(a:(Int):Int):Int { a() }')
       end
+      it { expect(parser.function).to parse("fn ():Int { 10 }")   }
+      it { expect(parser.function).to parse("fn():Int { 10 }")    }
+      it { expect(parser.function).to parse("fn () :Int { 10 }")  }
+      it { expect(parser.function).to parse("fn () : Int { 10 }") }
+
+      it { expect(parser.function).to parse("fn (a:Int):Int { a }")        }
+      it { expect(parser.function).to parse("fn ( a : Int ):Int { a }")    }
+      it { expect(parser.function).to parse("fn (a:Int, b:User):Int { a }")       }
+      it { expect(parser.function).to parse("fn ( a : Int, b : User ):Int { a }") }
     end
     context 'named functions' do
-      it 'allows function definition' do
-        expect(parser.named_function).to parse("fn first(a:Int, b:Int):Int { a }")
-        expect(parser.named_function).to parse("fn zero():Int { 0 }")
-      end
+      it { expect(parser.named_function).to parse("fn zero():Int { 0 }") }
+      it { expect(parser.named_function).to parse("fn zero ():Int { 0 }") }
+      it { expect(parser.named_function).to parse("fn zero ( ):Int { 0 }") }
+      it { expect(parser.named_function).to parse("fn zero ( ) :Int { 0 }") }
+      it { expect(parser.named_function).to parse("fn zero ( ) : Int { 0 }") }
+      it { expect(parser.named_function).to parse("fn first(a:Int, b:Int):Int { a }") }
+      it { expect(parser.named_function).to parse("fn first(a:User):Int { a }") }
     end
   end
   context 'calling functions' do
@@ -115,7 +140,7 @@ RSpec.describe GLParser do
   end
   context 'expressions' do
     it 'can take any valid piece of syntax' do
-      expect(parser.expression).to parse('a = fn (a:Int, b:Int):Int { "this wont pass the type checker" }')
+      expect(parser.expression).to parse('a = fn (a:Int, b:Int):Int { "this wont pass the type checker, but will pass" }')
     end
   end
 end

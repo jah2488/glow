@@ -1,7 +1,11 @@
 class Function < Node
   attr_reader :params, :body, :return_type, :name
   def initialize(params, body, return_type, name = "Anonymous")
-    @params = params
+    if params == ""
+      @params = []
+    else
+      @params = Array(params)
+    end
     @body   = body
     @name   = name.to_s.strip
     @return_type = return_type
@@ -28,6 +32,6 @@ class Function < Node
   end
 
   def inspect
-    "<Function #{name}(#{params.join(', ')}):#{return_type}>"
+    "<Function #{name}(#{Array(params).join(', ')}):#{return_type}>"
   end
 end

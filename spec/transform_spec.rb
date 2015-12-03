@@ -41,6 +41,13 @@ RSpec.describe GLTransform do
     end
   end
   context 'function' do
+    it { expect(trans("fn ():Int { 10 }")).to be_a(Function) }
+    it { expect(trans("fn (x:Int):Int { x }")).to be_a(Function) }
+    it { expect(trans("fn (x:Int, y:User) : Int { x }")).to be_a(Function) }
+
+    it { expect(trans("fn test():Boolean { test }")).to be_a(Function) }
+    it { expect(trans("fn foobaz(x:Int):Int { x }")).to be_a(Function) }
+    it { expect(trans("fn fizzbazz(x:Int, y:Int):Int { x }")).to be_a(Function) }
     it 'returns a function object' do
       expect(trans("fn (x:Int):Int { x }")).to be_a(Function)
       expect(trans("fn ():Int {

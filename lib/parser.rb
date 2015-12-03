@@ -3,6 +3,8 @@ class Main < Parslet::Parser
   rule(:space?) { space.maybe }
 
   literals = {
+    lt:     '<',
+    gt:     '>',
     lparen: '(',
     rparen: ')',
     lbrace: '{',
@@ -63,7 +65,15 @@ class GLParser < Main
   rule(:params) do
     lparen >> (param.maybe >> (comma >> param).repeat(0)).as(:params) >> rparen
   end
-  rule(:param) { (identifier.as(:param) >> space? >> colon >> constant.as(:type)) >> space? }
+  rule(:param) { (identifier.as(:param) >> space? >> colon >> type_signature.as(:type)) >> space? }
+  rule(:type_param) { (lt >> constant >> gt) }
+  rule(:type_signature) do
+    (constant |
+      (lt >> constant >> gt) |
+      lparen >>
+        type_signature.maybe >> (comma >> type_signature).repeat(0) >> space? >>
+      rparen >> str(":") >> type_signature)
+  end
 
   rule(:body) { lbrace >> expressions.as(:body) >> rbrace }
 

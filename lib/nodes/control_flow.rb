@@ -2,7 +2,7 @@ class ControlFlow < Node
 end
 
 class If < ControlFlow
-  attr_reader :predicate, :body
+  attr_reader :predicate, :body, :true_body, :false_body
   def initialize(predicate, true_body, false_body)
     @predicate = predicate
     @body = true_body
@@ -12,12 +12,14 @@ class If < ControlFlow
 
   def eval(env)
     pred = predicate.eval(env)
-    unless pred.nil? || pred == "false"
-      body.map { |node| node.eval(env) }
+    if pred.is_a?(True) || pred == "true"
+      true_body.map { |node| node.eval(env) }
+    else
+      false_body.map { |node| node.eval(env) }
     end
   end
 
   def inspect
-    "<If (#@predicate) {#@body}"
+    "<If (#@predicate) {#@true_body} else {#@false_body}"
   end
 end
